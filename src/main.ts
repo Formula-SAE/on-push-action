@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import { setFailed, getInput } from "@actions/core";
 import { parseEvent } from "./parser";
 import { ProviderConfig } from "./types";
 import { sendRequest } from "./api";
@@ -6,13 +6,13 @@ import { generateMessage } from "./message";
 
 export async function run(): Promise<void> {
   try {
-    const event = core.getInput("event");
-    const apiToken: string = core.getInput("apiToken");
-    const apiUrl: string = core.getInput("apiUrl");
-    const providers: string = core.getInput("providers");
+    const event = getInput("event");
+    const apiToken: string = getInput("apiToken");
+    const apiUrl: string = getInput("apiUrl");
+    const providers: string = getInput("providers");
 
     if (!event || !apiToken || !providers) {
-      core.setFailed("invalid inputs");
+      setFailed("invalid inputs");
       return;
     }
 
@@ -27,6 +27,6 @@ export async function run(): Promise<void> {
 
     await sendRequest(message, providerConfigs, apiToken, apiUrl);
   } catch (error: any) {
-    core.setFailed(error);
+    setFailed(error);
   }
 }

@@ -25668,27 +25668,24 @@ async function sendRequest(content, providerConfigs, apiToken, url) {
 /***/ }),
 
 /***/ 3084:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
-const core_1 = __importDefault(__nccwpck_require__(9999));
+const core_1 = __nccwpck_require__(9999);
 const parser_1 = __nccwpck_require__(2486);
 const api_1 = __nccwpck_require__(7945);
 const message_1 = __nccwpck_require__(9929);
 async function run() {
     try {
-        const event = core_1.default.getInput("event");
-        const apiToken = core_1.default.getInput("apiToken");
-        const apiUrl = core_1.default.getInput("apiUrl");
-        const providers = core_1.default.getInput("providers");
+        const event = (0, core_1.getInput)("event");
+        const apiToken = (0, core_1.getInput)("apiToken");
+        const apiUrl = (0, core_1.getInput)("apiUrl");
+        const providers = (0, core_1.getInput)("providers");
         if (!event || !apiToken || !providers) {
-            core_1.default.setFailed("invalid inputs");
+            (0, core_1.setFailed)("invalid inputs");
             return;
         }
         const parsedEvent = (0, parser_1.parseEvent)(event);
@@ -25700,7 +25697,7 @@ async function run() {
         await (0, api_1.sendRequest)(message, providerConfigs, apiToken, apiUrl);
     }
     catch (error) {
-        core_1.default.setFailed(error);
+        (0, core_1.setFailed)(error);
     }
 }
 
