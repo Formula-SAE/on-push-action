@@ -1,0 +1,24 @@
+{
+  "name": "on-push",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bundle": "pnpm format:write && pnpm package",
+    "format:check": "pnpm prettier --check .",
+    "format:write": "pnpm prettier --write .",
+    "package": "pnpm ncc build -o dist src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.3",
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.3",
+    "prettier": "^3.6.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1"
+  }
+}
