@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "bundle": "pnpm format:write && pnpm package",
-    "format:check": "pnpm prettier --check .",
-    "format:write": "pnpm prettier --write .",
+    "format:check": "pnpm prettier --check ./src",
+    "format:write": "pnpm prettier --write ./src",
     "package": "pnpm ncc build -o dist src/index.ts"
   },
   "keywords": [],

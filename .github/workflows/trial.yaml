@@ -1,0 +1,14 @@
+name: Tries this action
+
+on: push
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./
+        with:
+          event: ${{ toJson(github.event) }}
+          apiToken: ${{ secrets.API_TOKEN }}
+          apiUrl: ${{ secrets.API_URL }}
+          providers: ${{ secrets.PROVIDERS }}

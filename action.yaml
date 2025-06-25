@@ -1,0 +1,13 @@
+name: notify-push
+description: Notifies team members of pushes in a repository
+author: Apex Corse
+
+inputs:
+  event:
+    description: The "github.event"
+  apiUrl:
+    description: The URL of the messaging API
+  apiToken:
+    description: The token to communicate with the messaging API
+  providers:
+    description: String that contains the messaging provider to use for notifications, formatted like "provider:channelID", separated by comma
