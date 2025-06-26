@@ -25684,8 +25684,20 @@ async function run() {
         const apiToken = (0, core_1.getInput)("apiToken");
         const apiUrl = (0, core_1.getInput)("apiUrl");
         const providers = (0, core_1.getInput)("providers");
-        if (!event || !apiToken || !providers) {
-            (0, core_1.setFailed)("invalid inputs");
+        (0, core_1.debug)(apiToken);
+        (0, core_1.debug)(apiUrl);
+        (0, core_1.debug)(providers);
+        if (!event || !apiToken || !providers || !apiUrl) {
+            let error = "invalid inputs:";
+            if (!event)
+                error += "EVENT, ";
+            if (!apiToken)
+                error += "API_TOKEN, ";
+            if (!apiUrl)
+                error += "API_URL, ";
+            if (!providers)
+                error += "PROVIDERS";
+            (0, core_1.setFailed)(error);
             return;
         }
         const parsedEvent = (0, parser_1.parseEvent)(event);
