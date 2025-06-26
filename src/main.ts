@@ -11,10 +11,6 @@ export async function run(): Promise<void> {
     const apiUrl: string = getInput("apiUrl");
     const providers: string = getInput("providers");
 
-    debug(apiToken);
-    debug(apiUrl);
-    debug(providers);
-
     if (!event || !apiToken || !providers || !apiUrl) {
       let error = "invalid inputs:";
 
