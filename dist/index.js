@@ -25656,10 +25656,9 @@ async function sendRequest(content, providerConfigs, apiToken, url) {
         headers: {
             Authorization: `Bearer ${apiToken}`,
             "Content-Type": "application/json",
-            "Access-Control-Allow-Headers": "Authorization",
         },
         body: JSON.stringify({
-            content,
+            content: content,
             providers: providerConfigs,
         }),
     });
@@ -25702,11 +25701,16 @@ async function run() {
             return;
         }
         const parsedEvent = (0, parser_1.parseEvent)(event);
+        (0, core_1.debug)(`Parsed event; ${event}`);
         const providerList = providers.split(",");
+        (0, core_1.debug)(`Providers list: ${providerList}`);
         const providerConfigs = providerList
-            .filter((e) => e.length === 2)
+            .map((e) => e.split(":"))
+            .filter((e) => e.length == 2)
             .map((e) => ({ provider: e[0], channel: e[1] }));
+        (0, core_1.debug)(`Provider configs: ${providerConfigs}`);
         const message = (0, message_1.generateMessage)(parsedEvent);
+        (0, core_1.debug)(`Message: ${message}`);
         await (0, api_1.sendRequest)(message, providerConfigs, apiToken, apiUrl);
     }
     catch (error) {

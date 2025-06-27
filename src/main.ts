@@ -29,7 +29,8 @@ export async function run(): Promise<void> {
     const providerList = providers.split(",");
     debug(`Providers list: ${providerList}`);
     const providerConfigs = providerList
-      .filter((e) => e.length === 2)
+      .map((e) => e.split(":"))
+      .filter((e) => e.length == 2)
       .map<ProviderConfig>((e) => ({ provider: e[0], channel: e[1] }));
     debug(`Provider configs: ${providerConfigs}`);
 
