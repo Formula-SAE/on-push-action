@@ -4,17 +4,16 @@ export async function sendRequest(
   content: string,
   providerConfigs: ProviderConfig[],
   apiToken: string,
-  url: string,
+  url: string
 ) {
   const response = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiToken}`,
       "Content-Type": "application/json",
-      "Access-Control-Allow-Headers": "Authorization",
     },
     body: JSON.stringify({
-      content,
+      content: content,
       providers: providerConfigs,
     }),
   });

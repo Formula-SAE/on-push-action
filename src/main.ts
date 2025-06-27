@@ -24,13 +24,17 @@ export async function run(): Promise<void> {
     }
 
     const parsedEvent = parseEvent(event);
+    debug(`Parsed event; ${event}`);
 
     const providerList = providers.split(",");
+    debug(`Providers list: ${providerList}`);
     const providerConfigs = providerList
       .filter((e) => e.length === 2)
       .map<ProviderConfig>((e) => ({ provider: e[0], channel: e[1] }));
+    debug(`Provider configs: ${providerConfigs}`);
 
     const message = generateMessage(parsedEvent);
+    debug(`Message: ${message}`);
 
     await sendRequest(message, providerConfigs, apiToken, apiUrl);
   } catch (error: any) {
