@@ -6,7 +6,6 @@ jobs:
   echo:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: ./
         with:
           event: ${{ toJson(github.event) }}
