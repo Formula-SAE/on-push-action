@@ -11,6 +11,8 @@ inputs:
     description: The token to communicate with the messaging API
   providers:
     description: String that contains the messaging provider to use for notifications, formatted like "provider:channelID", separated by comma
+  refName:
+    description: The "github.ref_name"
 
 runs:
   using: node20

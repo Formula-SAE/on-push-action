@@ -25687,6 +25687,7 @@ async function run() {
         const apiToken = (0, core_1.getInput)("apiToken");
         const apiUrl = (0, core_1.getInput)("apiUrl");
         const providers = (0, core_1.getInput)("providers");
+        const refName = (0, core_1.getInput)("refName");
         if (!event || !apiToken || !providers || !apiUrl) {
             let error = "invalid inputs:";
             if (!event)
@@ -25709,7 +25710,7 @@ async function run() {
             .filter((e) => e.length == 2)
             .map((e) => ({ provider: e[0], channel: e[1] }));
         (0, core_1.debug)(`Provider configs: ${providerConfigs}`);
-        const message = (0, message_1.generateMessage)(parsedEvent);
+        const message = (0, message_1.generateMessage)(parsedEvent, refName);
         (0, core_1.debug)(`Message: ${message}`);
         await (0, api_1.sendRequest)(message, providerConfigs, apiToken, apiUrl);
     }
@@ -25728,17 +25729,18 @@ async function run() {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateMessage = generateMessage;
-function generateMessage(payload) {
+function generateMessage(payload, refName) {
     const commits = payload.commits.map((e) => `
-  - Autore: ${e.author.name}
-    Data Creazione: ${e.timestamp}
-    Messaggio: ${e.message}
-    URL: ${e.url}`);
+  - Autore: <i>${e.author.name}</i>
+    Data Creazione: ${new Date(e.timestamp).toLocaleString()}
+    Messaggio: <b>${e.message.split("\n")[0]}</b>
+    <a href="${e.url}">Link al commit</a>`);
     let message = `
-  Nuovo push ${payload.forced ? "FORZATO" : ""} da parte di ${payload.pusher.name}:
-  
-  Commits:
-    ${commits.join("\n")}`;
+  💥 <b>Nuovo push ${payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${payload.pusher.name}</i>:
+
+${refName != "" ? `<b>🪾 Branch</b>: <code>${refName}</code>\n` : ""}
+<b>📄 Commits</b>:
+  ${commits.join("\n")}`;
     return message;
 }
 

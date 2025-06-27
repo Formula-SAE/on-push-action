@@ -10,6 +10,7 @@ export async function run(): Promise<void> {
     const apiToken: string = getInput("apiToken");
     const apiUrl: string = getInput("apiUrl");
     const providers: string = getInput("providers");
+    const refName: string = getInput("refName");
 
     if (!event || !apiToken || !providers || !apiUrl) {
       let error = "invalid inputs:";
@@ -34,7 +35,7 @@ export async function run(): Promise<void> {
       .map<ProviderConfig>((e) => ({ provider: e[0], channel: e[1] }));
     debug(`Provider configs: ${providerConfigs}`);
 
-    const message = generateMessage(parsedEvent);
+    const message = generateMessage(parsedEvent, refName);
     debug(`Message: ${message}`);
 
     await sendRequest(message, providerConfigs, apiToken, apiUrl);
