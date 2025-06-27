@@ -11,7 +11,7 @@ export function generateMessage(payload: PushPayload, refName: string): string {
   );
 
   let message = `
-  💥 <b>Nuovo push ${payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${payload.pusher.name}</i>:
+  💥 <b>Nuovo push ${payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${payload.pusher.name}</i>
 
 ${refName != "" ? `<b>🪾 Branch</b>: <code>${refName}</code>\n` : ""}
 <b>📄 Commits</b>:

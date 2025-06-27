@@ -25736,7 +25736,7 @@ function generateMessage(payload, refName) {
     Messaggio: <b>${e.message.split("\n")[0]}</b>
     <a href="${e.url}">Link al commit</a>`);
     let message = `
-  💥 <b>Nuovo push ${payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${payload.pusher.name}</i>:
+  💥 <b>Nuovo push ${payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${payload.pusher.name}</i>
 
 ${refName != "" ? `<b>🪾 Branch</b>: <code>${refName}</code>\n` : ""}
 <b>📄 Commits</b>:
