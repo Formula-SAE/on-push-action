@@ -25653,7 +25653,11 @@ exports.sendRequest = sendRequest;
 async function sendRequest(content, providerConfigs, apiToken, url) {
     const response = await fetch(url, {
         method: "POST",
-        headers: { Authentication: `Bearer ${apiToken}` },
+        headers: {
+            Authorization: `Bearer ${apiToken}`,
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Headers": "Authorization",
+        },
         body: JSON.stringify({
             content,
             providers: providerConfigs,
@@ -25684,9 +25688,6 @@ async function run() {
         const apiToken = (0, core_1.getInput)("apiToken");
         const apiUrl = (0, core_1.getInput)("apiUrl");
         const providers = (0, core_1.getInput)("providers");
-        (0, core_1.debug)(apiToken);
-        (0, core_1.debug)(apiUrl);
-        (0, core_1.debug)(providers);
         if (!event || !apiToken || !providers || !apiUrl) {
             let error = "invalid inputs:";
             if (!event)
