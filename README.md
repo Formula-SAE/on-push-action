@@ -7,7 +7,7 @@ This action is made to run on every Apex Corse's repo that needs notifications o
 3. Parses it building a readable and informative message.
 4. Sends it to Apex Corse's bot, `king`.
 
-## Why this action?
+## Why this even exists?
 
 Every technical department inside Apex Corse uses Github to track progress of their projects, but the software they're using and the way they work makes using branch-based development almost impossible. 
 
