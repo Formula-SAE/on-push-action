@@ -25784,18 +25784,36 @@ class MessageGenerator {
         this.refName = refName;
     }
     generateMessage() {
-        const commits = this.payload.commits.map((e) => `
+        let message = `
+    💥 <b>Nuovo push ${this.payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${this.payload.pusher.name}</i>
+🔷 <b>Repo</b>: <code>${this.payload.repository.name}</code>`;
+        if (this.payload.ref.startsWith("refs/tags/")) {
+            return this.generateTagCreatedMessage(message);
+        }
+        if (this.payload.commits.length == 0) {
+            return this.generateBranchCreatedMessage(message);
+        }
+        const commits = this.generateCommits();
+        message += `
+${this.refName != "" ? `<b>🪾 Branch</b>: <code>${this.refName}</code>\n` : ""}
+<b>📄 Commits</b>:
+  ${commits}`;
+        return message;
+    }
+    generateTagCreatedMessage(baseMessage) {
+        return (baseMessage + `\n\n<b>🆕 Creato tag</b>: ${this.payload.ref.slice(10)}`);
+    }
+    generateBranchCreatedMessage(baseMessage) {
+        return (baseMessage + `\n\n<b>🆕 Creato branch</b>: ${this.payload.ref.slice(11)}`);
+    }
+    generateCommits() {
+        return this.payload.commits
+            .map((e) => `
     - Autore: <i>${e.author.name}</i>
       Data Creazione: ${new Date(e.timestamp).toLocaleString()}
       Messaggio: <b>${e.message.split("\n")[0]}</b>
-      <a href="${e.url}">Link al commit</a>`);
-        let message = `
-    💥 <b>Nuovo push ${this.payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${this.payload.pusher.name}</i>
-  
-${this.refName != "" ? `<b>🪾 Branch</b>: <code>${this.refName}</code>\n` : ""}
-<b>📄 Commits</b>:
-  ${commits.join("\n")}`;
-        return message;
+      <a href="${e.url}">Link al commit</a>`)
+            .join("\n");
     }
 }
 exports.MessageGenerator = MessageGenerator;
