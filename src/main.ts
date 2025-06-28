@@ -1,8 +1,9 @@
 import { setFailed, getInput, debug } from "@actions/core";
-import { parseEvent } from "./parser";
-import { ProviderConfig } from "./types";
+import { parseEvent } from "./event-parser";
 import { sendRequest } from "./api";
-import { generateMessage } from "./message";
+import { MessageGenerator } from "./message";
+import { ProviderParser } from "./providers";
+import { InputValidator } from "./input-validator";
 
 export async function run(): Promise<void> {
   try {
@@ -12,14 +13,15 @@ export async function run(): Promise<void> {
     const providers: string = getInput("providers");
     const refName: string = getInput("refName");
 
-    if (!event || !apiToken || !providers || !apiUrl) {
-      let error = "invalid inputs:";
-
-      if (!event) error += "EVENT, ";
-      if (!apiToken) error += "API_TOKEN, ";
-      if (!apiUrl) error += "API_URL, ";
-      if (!providers) error += "PROVIDERS";
-
+    const validator = new InputValidator({
+      apiToken: apiToken,
+      apiUrl: apiUrl,
+      event: event,
+      providers: providers,
+      refName: refName,
+    });
+    const error = validator.getError();
+    if (error) {
       setFailed(error);
       return;
     }
@@ -27,18 +29,14 @@ export async function run(): Promise<void> {
     const parsedEvent = parseEvent(event);
     debug(`Parsed event; ${event}`);
 
-    const providerList = providers.split(",");
-    debug(`Providers list: ${providerList}`);
-    const providerConfigs = providerList
-      .map((e) => e.split(":"))
-      .filter((e) => e.length == 2)
-      .map<ProviderConfig>((e) => ({ provider: e[0], channel: e[1] }));
-    debug(`Provider configs: ${providerConfigs}`);
+    const providerParser = new ProviderParser(providers);
+    const configs = providerParser.getConfigs();
 
-    const message = generateMessage(parsedEvent, refName);
+    const generator = new MessageGenerator(parsedEvent, refName);
+    const message = generator.generateMessage();
     debug(`Message: ${message}`);
 
-    await sendRequest(message, providerConfigs, apiToken, apiUrl);
+    await sendRequest(message, configs, apiToken, apiUrl);
   } catch (error: any) {
     setFailed(error);
   }

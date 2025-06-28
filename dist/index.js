@@ -25670,6 +25670,56 @@ async function sendRequest(content, providerConfigs, apiToken, url) {
 
 /***/ }),
 
+/***/ 6537:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parseEvent = parseEvent;
+function parseEvent(event) {
+    return JSON.parse(event);
+}
+
+
+/***/ }),
+
+/***/ 2190:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.InputValidator = void 0;
+class InputValidator {
+    inputs;
+    constructor(inputs) {
+        this.inputs = inputs;
+    }
+    getError() {
+        if (!this.inputs.event ||
+            !this.inputs.apiToken ||
+            !this.inputs.providers ||
+            !this.inputs.apiUrl) {
+            let error = "invalid inputs:";
+            if (!this.inputs.event)
+                error += "EVENT, ";
+            if (!this.inputs.apiToken)
+                error += "API_TOKEN, ";
+            if (!this.inputs.apiUrl)
+                error += "API_URL, ";
+            if (!this.inputs.providers)
+                error += "PROVIDERS";
+            return error;
+        }
+        return undefined;
+    }
+}
+exports.InputValidator = InputValidator;
+
+
+/***/ }),
+
 /***/ 3084:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -25678,9 +25728,11 @@ async function sendRequest(content, providerConfigs, apiToken, url) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 const core_1 = __nccwpck_require__(9999);
-const parser_1 = __nccwpck_require__(2486);
+const event_parser_1 = __nccwpck_require__(6537);
 const api_1 = __nccwpck_require__(7945);
 const message_1 = __nccwpck_require__(9929);
+const providers_1 = __nccwpck_require__(7883);
+const input_validator_1 = __nccwpck_require__(2190);
 async function run() {
     try {
         const event = (0, core_1.getInput)("event");
@@ -25688,31 +25740,26 @@ async function run() {
         const apiUrl = (0, core_1.getInput)("apiUrl");
         const providers = (0, core_1.getInput)("providers");
         const refName = (0, core_1.getInput)("refName");
-        if (!event || !apiToken || !providers || !apiUrl) {
-            let error = "invalid inputs:";
-            if (!event)
-                error += "EVENT, ";
-            if (!apiToken)
-                error += "API_TOKEN, ";
-            if (!apiUrl)
-                error += "API_URL, ";
-            if (!providers)
-                error += "PROVIDERS";
+        const validator = new input_validator_1.InputValidator({
+            apiToken: apiToken,
+            apiUrl: apiUrl,
+            event: event,
+            providers: providers,
+            refName: refName,
+        });
+        const error = validator.getError();
+        if (error) {
             (0, core_1.setFailed)(error);
             return;
         }
-        const parsedEvent = (0, parser_1.parseEvent)(event);
+        const parsedEvent = (0, event_parser_1.parseEvent)(event);
         (0, core_1.debug)(`Parsed event; ${event}`);
-        const providerList = providers.split(",");
-        (0, core_1.debug)(`Providers list: ${providerList}`);
-        const providerConfigs = providerList
-            .map((e) => e.split(":"))
-            .filter((e) => e.length == 2)
-            .map((e) => ({ provider: e[0], channel: e[1] }));
-        (0, core_1.debug)(`Provider configs: ${providerConfigs}`);
-        const message = (0, message_1.generateMessage)(parsedEvent, refName);
+        const providerParser = new providers_1.ProviderParser(providers);
+        const configs = providerParser.getConfigs();
+        const generator = new message_1.MessageGenerator(parsedEvent, refName);
+        const message = generator.generateMessage();
         (0, core_1.debug)(`Message: ${message}`);
-        await (0, api_1.sendRequest)(message, providerConfigs, apiToken, apiUrl);
+        await (0, api_1.sendRequest)(message, configs, apiToken, apiUrl);
     }
     catch (error) {
         (0, core_1.setFailed)(error);
@@ -25728,35 +25775,56 @@ async function run() {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateMessage = generateMessage;
-function generateMessage(payload, refName) {
-    const commits = payload.commits.map((e) => `
-  - Autore: <i>${e.author.name}</i>
-    Data Creazione: ${new Date(e.timestamp).toLocaleString()}
-    Messaggio: <b>${e.message.split("\n")[0]}</b>
-    <a href="${e.url}">Link al commit</a>`);
-    let message = `
-  💥 <b>Nuovo push ${payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${payload.pusher.name}</i>
-
-${refName != "" ? `<b>🪾 Branch</b>: <code>${refName}</code>\n` : ""}
+exports.MessageGenerator = void 0;
+class MessageGenerator {
+    payload;
+    refName;
+    constructor(payload, refName) {
+        this.payload = payload;
+        this.refName = refName;
+    }
+    generateMessage() {
+        const commits = this.payload.commits.map((e) => `
+    - Autore: <i>${e.author.name}</i>
+      Data Creazione: ${new Date(e.timestamp).toLocaleString()}
+      Messaggio: <b>${e.message.split("\n")[0]}</b>
+      <a href="${e.url}">Link al commit</a>`);
+        let message = `
+    💥 <b>Nuovo push ${this.payload.forced ? "(FORZATO ⚠️) " : ""}da parte di</b>:  <i>${this.payload.pusher.name}</i>
+  
+${this.refName != "" ? `<b>🪾 Branch</b>: <code>${this.refName}</code>\n` : ""}
 <b>📄 Commits</b>:
   ${commits.join("\n")}`;
-    return message;
+        return message;
+    }
 }
+exports.MessageGenerator = MessageGenerator;
 
 
 /***/ }),
 
-/***/ 2486:
+/***/ 7883:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseEvent = parseEvent;
-function parseEvent(event) {
-    return JSON.parse(event);
+exports.ProviderParser = void 0;
+class ProviderParser {
+    providerString;
+    constructor(providerString) {
+        this.providerString = providerString;
+    }
+    getConfigs() {
+        const providerList = this.providerString.split(",");
+        const providerConfigs = providerList
+            .map((e) => e.split(":"))
+            .filter((e) => e.length == 2)
+            .map((e) => ({ provider: e[0], channel: e[1] }));
+        return providerConfigs;
+    }
 }
+exports.ProviderParser = ProviderParser;
 
 
 /***/ }),
